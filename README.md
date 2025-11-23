@@ -44,7 +44,7 @@ hospital_service_weekly: Presenta datos semanales a nivel de servicio, permitien
 
 hospital_staff_schedule: Incluye los horarios semanales del personal, lo que facilita estudiar la relación entre la disponibilidad de trabajadores y la atención brindada.
 
-En conjunto, estas bases permiten explorar la interacción entre el flujo de pacientes, la asignación de camas y la gestión del personal, proporcionando una estructura sólida para realizar análisis estadísticos orientados a la optimización de recursos y a la mejora en la toma de decisiones en el contexto hospitalario.
+En conjunto, estas bases permiten explorar la interacción entre el flujo de pacientes, la asignación de camas y la gestión del personal, proporcionando una estructura sólida para realizar análisis estadísticos.
 
 ## 5. Objetivos
 
