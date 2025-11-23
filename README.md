@@ -6,6 +6,9 @@
 - Justin Zhu Fan
 
 ## 1. Introducción 
+La adecuada gestión de camas hospitalarias es un elemento clave para garantizar una atención médica eficiente y oportuna. En hospitales de tamaño mediano, la distribución de camas, la asignación de personal y el flujo de pacientes representan desafíos constantes que pueden afectar la calidad del servicio y la disponibilidad de recursos. Por ello, el análisis de datos se convierte en una herramienta fundamental para comprender y optimizar estos procesos.
+
+Este proyecto se basa en un conjunto de datos sintético que simula las operaciones reales de un hospital, incorporando información sobre personal, pacientes, servicios y horarios. A partir de estos datos, se busca analizar el comportamiento de la demanda hospitalaria y la utilización de camas entre distintos servicios, con el fin de identificar patrones, posibles cuellos de botella y oportunidades de mejora en la administración de los recursos hospitalarios.
 
 ## 2. Justificación 
 
@@ -15,7 +18,33 @@ Por ende, el proyecto Camas de hospitales toma como base la teoría estadística
 
 ## 3. Selección de la base de datos
 
+Para este proyecto se seleccionó el conjunto de datos “Hospital Beds Management” de Kaggle porque ofrece información estructurada y detallada sobre procesos clave de un hospital: ingreso de pacientes, servicios, uso de camas, dotación de personal y horarios.
+
+Desde el punto de vista estadístico, esta base de datos es adecuada porque:
+
+Contiene variables cuantitativas y categóricas, lo que permite aplicar técnicas descriptivas (tablas, gráficos, medidas de resumen) y comparativas (ANOVA, pruebas de hipótesis entre grupos, etc.).
+
+Incluye información a nivel individual (pacientes y personal) y a nivel agregado (servicio semanal), lo que facilita análisis por niveles, como comparación entre servicios, semanas o tipos de pacientes.
+
+La estructura de los datos permite plantear modelos de regresión para estudiar factores asociados al uso de camas, duración de la estancia o demanda de servicios.
+
+Al ser un conjunto de datos sintético, se puede trabajar libremente sin restricciones de confidencialidad, manteniendo un escenario realista para la práctica de análisis en gestión hospitalaria.
+
+Estas características hacen que la base sea pertinente para los objetivos del proyecto, centrados en analizar y modelar el comportamiento de variables relacionadas con la administración de camas hospitalarias.
+
 ## 4. Descripción de la base de datos
+
+El conjunto de datos está compuesto por cuatro archivos en formato CSV, los cuales representan diferentes dimensiones operativas del hospital:
+
+hospital_staff: Contiene información del personal hospitalario, incluyendo su identificación, rol, departamento y otros datos relevantes para el análisis de la dotación de recursos humanos.
+
+hospital_patients: Registra datos relacionados con los pacientes, tales como información básica, fechas de ingreso, servicios asignados y estado de hospitalización.
+
+hospital_service_weekly: Presenta datos semanales a nivel de servicio, permitiendo analizar el uso de camas, la demanda de pacientes y el rendimiento de cada área médica.
+
+hospital_staff_schedule: Incluye los horarios semanales del personal, lo que facilita estudiar la relación entre la disponibilidad de trabajadores y la atención brindada.
+
+En conjunto, estas bases permiten explorar la interacción entre el flujo de pacientes, la asignación de camas y la gestión del personal, proporcionando una estructura sólida para realizar análisis estadísticos.
 
 ## 5. Objetivos
 
