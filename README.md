@@ -14,7 +14,7 @@ En la actualidad, la gestión de camas de hospitales es un aspecto clave para ga
 Por ende, el proyecto Camas de hospitales toma como base la teoría estadística y las herramientas de programación para aplicar un análisis sólido a partir de una base de datos sobre camas de hospitales, y así obtener resultados que permitan una toma de decisiones más adecuada en el manejo de dichas camas.
 
 ## 3. Selección de la base de datos
-
+jhgjhgj
 ## 4. Descripción de la base de datos
 
 ## 5. Objetivos
