@@ -125,9 +125,21 @@ def server(input, output, session):
 
     @render.table
     def satis_model_tbl():
-        coef = satis_model.summary2().tables[1].reset_index().rename(columns={"index": "term"})
-        num_cols = coef.select_dtypes(include=[float, int]).columns
+        selected = input.services_sel()
+        df = patients[patients["service"].isin(selected)]
+
+        model = smf.ols("satisfaction ~ stay_days * C(service)", data=df).fit()
+
+        coef = (
+            model.summary2()
+            .tables[1]
+            .reset_index()
+            .rename(columns={"index": "term"})
+        )
+
+        num_cols = coef.select_dtypes(include=["float", "int"]).columns
         coef[num_cols] = coef[num_cols].round(3)
+
         return coef[["term", "Coef.", "Std.Err.", "t", "P>|t|"]]
 
     @render.text
