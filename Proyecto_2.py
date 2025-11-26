@@ -77,30 +77,26 @@ app_ui = ui.page_fluid(
 def server(input, output, session):
     @render.plot
     def beds_plot():
-        summary_df = (
-            services_weekly.groupby("service")
-            .agg(n=("beds_used", "size"),
-                 mean_beds=("beds_used", "mean"),
-                 sd_beds=("beds_used", "std"))
-            .reset_index()
-        )
-        summary_df["se"] = summary_df["sd_beds"] / np.sqrt(summary_df["n"])
-        summary_df["ci_low"] = summary_df["mean_beds"] - 1.96 * summary_df["se"]
-        summary_df["ci_high"] = summary_df["mean_beds"] + 1.96 * summary_df["se"]
-
         fig, ax = plt.subplots()
-        sns.barplot(data=summary_df, x="service", y="mean_beds",
-                    ax=ax, color="#2A9D8F", ci=None)
-        ax.errorbar(x=np.arange(len(summary_df)),
-                    y=summary_df["mean_beds"],
-                    yerr=[summary_df["mean_beds"] - summary_df["ci_low"],
-                          summary_df["ci_high"] - summary_df["mean_beds"]],
-                    fmt="none", ecolor="black", capsize=4)
+
+       
+        order = ["ICU", "emergency", "general_medicine", "surgery"]
+
+        sns.boxplot(
+            data=services_weekly,
+            x="service",
+            y="beds_used",
+            order=order,
+            ax=ax
+        )
+
         ax.set_xlabel("Servicio")
-        ax.set_ylabel("Camas usadas (promedio semanal)")
+        ax.set_ylabel("Camas usadas por semana")
+        ax.set_title("Distribución de camas usadas por servicio")
+
         plt.tight_layout()
         return fig
-
+     
     @render.table
     def anova_tbl():
         df = anova_table.reset_index().rename(columns={"index": "term"})
