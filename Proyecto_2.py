@@ -113,11 +113,36 @@ def server(input, output, session):
 
     @render.plot
     def satis_plot():
+        # Filtrar datos según servicios elegidos
+        selected = input.services_sel()
+        df = patients[patients["service"].isin(selected)]
+
+        # Modelo con interacción
+        model = smf.ols("satisfaction ~ stay_days * C(service)", data=df).fit()
+
+        # Gráfico
         fig, ax = plt.subplots()
-        sns.scatterplot(data=patients, x="stay_days", y="satisfaction",
-                        hue="service", alpha=0.5, ax=ax)
-        sns.regplot(data=patients, x="stay_days", y="satisfaction",
-                    scatter=False, ax=ax, color="black", lowess=True)
+
+        # Puntos
+        sns.scatterplot(
+            data=df,
+            x="stay_days",
+            y="satisfaction",
+            hue="service",
+            alpha=0.5,
+            ax=ax,
+        )
+
+        # Línea para cada servicio
+        for serv in selected:
+            temp = df[df["service"] == serv]
+            x_vals = np.linspace(temp["stay_days"].min(), temp["stay_days"].max(), 50)
+            new_data = pd.DataFrame(
+                {"stay_days": x_vals, "service": [serv] * len(x_vals)}
+            )
+            y_hat = model.predict(new_data)
+            ax.plot(x_vals, y_hat, linewidth=2)
+
         ax.set_xlabel("Días de estadía")
         ax.set_ylabel("Satisfacción del paciente")
         plt.tight_layout()
