@@ -33,7 +33,7 @@ tukey_df = pd.DataFrame(tukey.summary().data[1:], columns=tukey.summary().data[0
 
 # UI
 app_ui = ui.page_fluid(
-    ui.h2("Proyecto Servicios Médicos - Análisis (Python Shiny)"),
+    ui.h2("Proyecto Camas de hospital - Análisis estadístico por Justin y Fabián"),
     ui.navset_tab(
         # Tab 1: ANOVA
         ui.nav_panel(
