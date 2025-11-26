@@ -54,9 +54,21 @@ app_ui = ui.page_fluid(
         ui.nav_panel(
             "Satisfacción vs estadía",
             ui.layout_columns(
-                ui.card(ui.output_plot("satis_plot")),
-                ui.card(ui.h4("Regresión lineal"), ui.output_table("satis_model_tbl"))
-            )
+                ui.card(
+                    ui.input_selectize(
+                        "services_sel",
+                        "Seleccione servicios:",
+                        choices=sorted(patients["service"].unique()),
+                        selected=sorted(patients["service"].unique()),
+                        multiple=True,
+                    ),
+                    ui.output_plot("satis_plot"),
+                ),
+                ui.card(
+                    ui.h4("Regresión lineal"),
+                    ui.output_table("satis_model_tbl"),
+                ),
+            ),
         ),
         ui.nav_panel(
             "Predicción estadía por edad",
