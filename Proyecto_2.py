@@ -1,4 +1,4 @@
-# Librerías que se utilizan en el proyecto
+# Librerías
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -11,46 +11,44 @@ from statsmodels.stats.multicomp import pairwise_tukeyhsd
 
 sns.set(style="whitegrid")
 
-# Se cargan los datos 
+# Datos
 patients = pd.read_csv("patients.csv", parse_dates=["arrival_date", "departure_date"])
 services_weekly = pd.read_csv("services_weekly.csv")
 staff = pd.read_csv("staff.csv")
 staff_schedule = pd.read_csv("staff_schedule.csv")
 
-# Calculo de algunas variables
+# Variables nuevas
 patients["stay_days"] = (patients["departure_date"] - patients["arrival_date"]).dt.days
 services_weekly["beds_used"] = services_weekly["patients_admitted"]
 
-# Modelos pre-calculados
+# Modelo para ANOVA
 anova_model = smf.ols("beds_used ~ C(service)", data=services_weekly).fit()
 anova_table = anova_lm(anova_model, typ=2)
-tukey = pairwise_tukeyhsd(endog=services_weekly["beds_used"],
-                          groups=services_weekly["service"], alpha=0.05)
+tukey = pairwise_tukeyhsd(
+    endog=services_weekly["beds_used"],
+    groups=services_weekly["service"],
+    alpha=0.05,
+)
 tukey_df = pd.DataFrame(tukey.summary().data[1:], columns=tukey.summary().data[0])
 
-satis_model = smf.ols("satisfaction ~ stay_days", data=patients).fit()
-stay_age_model = smf.ols("stay_days ~ age", data=patients).fit()
-
-pred_ages = pd.DataFrame({"age": [30, 45, 65, 80]})
-pred_age_ci = stay_age_model.get_prediction(pred_ages).summary_frame(alpha=0.05)
-pred_age_table = pd.concat(
-    [pred_ages, pred_age_ci[["mean", "mean_ci_lower", "mean_ci_upper"]]], axis=1
-)
-
-# Parte visual UI
+# UI
 app_ui = ui.page_fluid(
     ui.h2("Proyecto Servicios Médicos - Análisis (Python Shiny)"),
     ui.navset_tab(
+        # Tab 1: ANOVA
         ui.nav_panel(
             "Camas por servicio (ANOVA)",
             ui.layout_columns(
                 ui.card(ui.h4("Medias e IC por servicio"), ui.output_plot("beds_plot")),
                 ui.card(
-                    ui.h4("ANOVA"), ui.output_table("anova_tbl"),
-                    ui.h4("Tukey 95%"), ui.output_table("tukey_tbl")
+                    ui.h4("ANOVA"),
+                    ui.output_table("anova_tbl"),
+                    ui.h4("Tukey 95%"),
+                    ui.output_table("tukey_tbl"),
                 ),
             ),
         ),
+        # Tab 2: satisfacción vs estadía
         ui.nav_panel(
             "Satisfacción vs estadía",
             ui.layout_columns(
@@ -70,28 +68,23 @@ app_ui = ui.page_fluid(
                 ),
             ),
         ),
+        # Tab 3: gráfico de líneas de solicitudes de pacientes
         ui.nav_panel(
-            "Predicción estadía por edad",
-            ui.layout_columns(
-                ui.card(ui.h4("Modelo stay_days ~ age"), ui.output_text_verbatim("stay_age_summary")),
-                ui.card(ui.h4("Predicciones fijas (IC 95%)"), ui.output_table("age_pred_tbl"))
-            ),
+            "Solicitudes de pacientes",
             ui.card(
-                ui.input_slider("edad", "Edad", min=0, max=100, value=50, step=1),
-                ui.output_table("age_pred_dynamic"),
-                ui.output_ui("age_plotly")  # Plotly interactivo
-            )
-        )
-    )
+                ui.h4("Solicitudes de pacientes por semana y servicio"),
+                ui.output_plot("requests_line_plot"),
+            ),
+        ),
+    ),
 )
 
-# Parte mecánica (Server)
+# Server
 def server(input, output, session):
+    # Tab 1: ANOVA
     @render.plot
     def beds_plot():
         fig, ax = plt.subplots()
-
-       
         order = ["ICU", "emergency", "general_medicine", "surgery"]
 
         sns.boxplot(
@@ -99,16 +92,15 @@ def server(input, output, session):
             x="service",
             y="beds_used",
             order=order,
-            ax=ax
+            ax=ax,
         )
 
         ax.set_xlabel("Servicio")
         ax.set_ylabel("Camas usadas por semana")
         ax.set_title("Distribución de camas usadas por servicio")
-
         plt.tight_layout()
         return fig
-     
+
     @render.table
     def anova_tbl():
         df = anova_table.reset_index().rename(columns={"index": "term"})
@@ -123,19 +115,16 @@ def server(input, output, session):
         df[num_cols] = df[num_cols].round(3)
         return df
 
+    # Tab 2: satisfacción vs estadía
     @render.plot
     def satis_plot():
-        # Filtrar datos según servicios elegidos
         selected = input.services_sel()
         df = patients[patients["service"].isin(selected)]
 
-        # Modelo con interacción
         model = smf.ols("satisfaction ~ stay_days * C(service)", data=df).fit()
 
-        # Gráfico
         fig, ax = plt.subplots()
 
-        # Puntos
         sns.scatterplot(
             data=df,
             x="stay_days",
@@ -145,7 +134,6 @@ def server(input, output, session):
             ax=ax,
         )
 
-        # Línea para cada servicio
         for serv in selected:
             temp = df[df["service"] == serv]
             x_vals = np.linspace(temp["stay_days"].min(), temp["stay_days"].max(), 50)
@@ -179,47 +167,27 @@ def server(input, output, session):
 
         return coef[["term", "Coef.", "Std.Err.", "t", "P>|t|"]]
 
-    @render.text
-    def stay_age_summary():
-        return stay_age_model.summary().as_text()
-
-    @render.table
-    def age_pred_tbl():
-        df = pred_age_table.copy()
-        df.columns = ["edad", "pred_dias", "ci_inf", "ci_sup"]
-        df[["pred_dias", "ci_inf", "ci_sup"]] = df[["pred_dias", "ci_inf", "ci_sup"]].round(2)
-        return df
-
-    @reactive.Calc
-    def dynamic_age_pred():
-        age_df = pd.DataFrame({"age": [input.edad()]})
-        pred = stay_age_model.get_prediction(age_df).summary_frame(alpha=0.05)
-        out = pd.concat([age_df, pred[["mean", "mean_ci_lower", "mean_ci_upper"]]], axis=1)
-        out.columns = ["edad", "pred_dias", "ci_inf", "ci_sup"]
-        out[["pred_dias", "ci_inf", "ci_sup"]] = out[["pred_dias", "ci_inf", "ci_sup"]].round(2)
-        return out
-
-    @render.table
-    def age_pred_dynamic():
-        return dynamic_age_pred()
-
-    @render.ui
-    def age_plotly():
-        df = dynamic_age_pred()
-        fig = px.scatter(
-            df, x="edad", y="pred_dias",
-            error_y=df["ci_sup"] - df["pred_dias"],
-            error_y_minus=df["pred_dias"] - df["ci_inf"],
-            labels={"edad": "Edad", "pred_dias": "Pred. días de estadía"},
-            title="Predicción con IC 95% (Plotly)"
-        )
-        return ui.output_plot("plotly_dummy")  # placeholder; Shiny muestra fig abajo
-
+    # Tab 3: línea de solicitudes de pacientes
     @render.plot
-    def plotly_dummy():
-        # Se usa sólo como placeholder; el gráfico real es el objeto Plotly devuelto arriba
+    def requests_line_plot():
         fig, ax = plt.subplots()
-        ax.axis("off")
+
+        df = services_weekly.sort_values(["week", "service"])
+
+        sns.lineplot(
+            data=df,
+            x="week",
+            y="patients_request",
+            hue="service",
+            marker="o",
+            ax=ax,
+        )
+
+        ax.set_xlabel("Semana del año")
+        ax.set_ylabel("Solicitudes de pacientes")
+        ax.set_title("Solicitudes de pacientes por servicio a lo largo del año")
+        ax.legend(title="Servicio")
+        plt.tight_layout()
         return fig
 
 app = App(app_ui, server)
