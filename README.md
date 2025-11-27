@@ -62,7 +62,7 @@ Analizar el comportamiento de diferentes variables referentes al manejo de camas
 
 2- Observar la satisfacción de los pacientes durante el tiempo de estadía en el centro médico.
 
-3- Predecir el tiempo de estadía de los pacientes según la edad de los mismos.
+3- Identificar los momentos del año con mayor peticiones de camas por pacientes
 
 ## 6. Preguntas 
 
@@ -72,13 +72,22 @@ En relación con los objetivos propuestos, la app de shiny debe dar respuesta a 
 
 ¿Cómo se comporta la satisfacción de los pacientes según su tiempo de estadía?
 
-¿Cuánto es el tiempo de estadía de un paciente de 30,45,65 y 80 años? Agregar intervalos de confianza.
+¿Cuáles son las semanas con más peticiones de camas de pacientes durante el año?
 
-## 7. Metodología 
+## 7. Conclusiones
 
+El ANOVA confirmó diferencias significativas en el uso de camas entre los servicios. La prueba Tukey mostró que Medicina General es el servicio con mayor demanda, seguido por Cirugía y Urgencias, mientras que la UCI es el que utiliza menos camas. Todas las comparaciones entre servicios fueron estadísticamente significativas.
 
-## 8. Resultados 
+Al aumentar en un día la estadía de los pacientes de emergencias la sactisfacción de los pacientes aumenta en 0.42 puntos.
 
-## 9. Conclusiones
+Las semanas con mayores solicitudes de camas por pacientes son a inicios de año.
 
+Desde la semana 1 hasta la última semana del año, la menor solicitud de camas de pacientes fueron las de cuidados intesivos.
 
+## 8. Recomendaciones
+
+Considerar más variables en la base datos como el tipo de enfermedades que puede presentar los pacientes por temporada como por ejemplo la influenza.
+
+Realizar el análisis con diferentes poblaciones ya que el perfil epidemiológico puede variar y afectar el uso de terminados tipos de camas.
+
+Explorar modelos con más variables para determinar la cantidad óptima de camas que debe tener un hospital en un momento del año.
